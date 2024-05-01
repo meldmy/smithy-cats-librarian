@@ -11,8 +11,7 @@
     "docker-compose@latest",
     "unzip@latest",
     "hub@latest",
-    "sbt@latest",
-    "tree@latest"
+    "sbt@latest"
   ],
   "shell": {
     "init_hook": [
