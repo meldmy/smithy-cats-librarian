@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.6/.schema/devbox.schema.json",
+  "packages": [
+    "vscode-extensions.disneystreaming.smithy@latest",
+    "metals@latest",
+    "vscode-extensions.scalameta.metals@latest",
+    "scala_3@latest",
+    "awscli2@latest",
+    "nodejs@18.4",
+    "python3@latest",
+    "docker-compose@latest",
+    "unzip@latest",
+    "hub@latest",
+    "sbt@latest",
+    "tree@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'Welcome to devbox!' > /dev/null"
+    ],
+    "scripts": {
+      "test": [
+        "echo \"Error: no test specified\" && exit 1"
+      ]
+    }
+  }
+}
