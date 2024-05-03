@@ -4,14 +4,16 @@
     "vscode-extensions.disneystreaming.smithy@latest",
     "metals@latest",
     "vscode-extensions.scalameta.metals@latest",
-    "scala_3@latest",
+    "scala_3@3.3.1",
     "awscli2@latest",
     "nodejs@18.4",
     "python3@latest",
     "docker-compose@latest",
     "unzip@latest",
     "hub@latest",
-    "sbt@latest"
+    "sbt@latest",
+    "httpie@latest",
+    "scalafmt@latest"
   ],
   "shell": {
     "init_hook": [
