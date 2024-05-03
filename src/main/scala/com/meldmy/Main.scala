@@ -2,37 +2,45 @@ package com.meldmy
 
 import cats.effect.IO
 import cats.effect.IOApp
+import cats.effect.Resource
 import com.comcast.ip4s.host
 import com.comcast.ip4s.port
 import com.meldmy.Swagger.swaggerRoutes
-import com.meldmy.service.ContentRepository
-import com.meldmy.service.ContentService
-import content.ContentGroup.*
-import content.ContentId
-import content.ContentServiceGen
-import content.ContentTitle
-import content.ContentType.*
+import com.meldmy.service.BookRepository
+import com.meldmy.service.DefaultLibraryService
+import com.meldmy.service.MemberRepository
+import library.Genre
+import library.Genre.BIOGRAPHY
+import library.LibraryServiceGen
+import org.http4s.HttpRoutes
 import org.http4s.Uri
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.Server
+import smithy4s.Timestamp
 import smithy4s.http4s
 import smithy4s.http4s.SimpleRestJsonBuilder
-import smithy4s.http4s.SimpleRestJsonBuilder.RouterBuilder
 import smithy4s.http4s.swagger.docs
 
-object Main extends IOApp.Simple {
+//TODO: add more tests
+object ServerMain extends IOApp.Simple {
   import cats.implicits.*
 
   def run: IO[Unit] =
     for {
-      repo <- ContentRepository.apply[IO]()
-      routerBuilder = SimpleRestJsonBuilder.routes(ContentService.apply(repo))
-      server <- createServer(routerBuilder).evalMap(srv => IO.println(srv.addressIp4s)).useForever
+      bookRepository <- BookRepository.apply[IO]()
+      memberRepository <- MemberRepository.apply[IO]()
+      libraryRoutes = SimpleRestJsonBuilder.routes(
+        DefaultLibraryService.apply(bookRepository, memberRepository)
+      )
+      server <-
+        createServer(libraryRoutes.resource)
+          .evalMap((srv: Server) => IO.println(srv.addressIp4s))
+          .useForever
     } yield server
 
-  private def createServer(routerBuilder: RouterBuilder[ContentServiceGen, IO]) = routerBuilder
-    .resource
-    .map(serviceRoutes => swaggerRoutes <+> serviceRoutes)
+  private def createServer(routes: Resource[IO, HttpRoutes[IO]]) = routes
+    .map((serviceRoutes: HttpRoutes[IO]) => swaggerRoutes <+> serviceRoutes)
     .flatMap { routes =>
       EmberServerBuilder
         .default[IO]
@@ -45,56 +53,46 @@ object Main extends IOApp.Simple {
 }
 
 object Swagger {
-  val swaggerRoutes = docs[IO](ContentServiceGen)
+  val swaggerRoutes = docs[IO](LibraryServiceGen)
 }
 
 object ClientMain extends IOApp.Simple {
 
   override def run: IO[Unit] = EmberClientBuilder.default[IO].build.use { c =>
-    SimpleRestJsonBuilder(ContentServiceGen)
+    SimpleRestJsonBuilder(LibraryServiceGen)
       .client(c)
       .uri(Uri.unsafeFromString("http://localhost:9077"))
       .resource
       .use { client =>
         for {
-          _ <- client.createContent(
-            ContentId("1"),
-            CHANNEL,
-            PLAYABLE,
-            ContentTitle("Howard Stern 24/7"),
+          _ <- client.createBook(
+            "The Snowball: Warren Buffett and the Business of Life",
+            "Alice Schroeder",
+            Timestamp.fromEpochMilli(System.currentTimeMillis()),
+            BIOGRAPHY,
+            Some("https://m.media-amazon.com/images/I/71EsoCQzRtL._SL1500_.jpg"),
           )
-          _ <- client.createContent(
-            ContentId("2"),
-            EPISODE,
-            PLAYABLE,
-            ContentTitle("Howard Stern - Interview with Dave Grohl"),
+          _ <- client.createBook(
+            "Ray Dalio: Principles for Success",
+            "Ray Dalio",
+            Timestamp.fromEpochMilli(System.currentTimeMillis()),
+            BIOGRAPHY,
+            Some("https://m.media-amazon.com/images/I/61QX7I6f+cL._SL1500_.jpg"),
           )
-          _ <- client.createContent(
-            ContentId("3"),
-            EPISODE,
-            PLAYABLE,
-            ContentTitle("Howard Stern - Metallica, Miley Cyrus, and Elton\nJohn"),
+          lastBook <- client.createBook(
+            "The Changing World Order: Why Nations Succeed and Fail",
+            "Ray Dalio",
+            Timestamp.fromEpochMilli(System.currentTimeMillis()),
+            BIOGRAPHY,
+            Some("https://m.media-amazon.com/images/I/61b6uC-m2OL._SL1500_.jpg"),
           )
-          _ <- client.createContent(
-            ContentId("4"),
-            CHANNEL,
-            PLAYABLE,
-            ContentTitle("SiriusXM NFL Radio"),
-          )
-          _ <- client.createContent(
-            ContentId("5"),
-            SHOW,
-            CONTAINER,
-            ContentTitle("Howard Stern"),
-          )
-          _ <- client.createContent(
-            ContentId("6"),
-            CATEGORY,
-            CONTAINER,
-            ContentTitle("Sports"),
-          )
-          content <- client.queryContents("Alexa, play Howard Stern on SiriusXM")
-          _ <- IO.println(content)
+          receivedBook <- client.getBook(lastBook.id)
+          _ <- IO.println(s"last book created: $receivedBook")
+          firstBatch <- client.getAllBooks(maxPageSize = 2)
+          _ <- IO.println(s"first batch: ${firstBatch.content.map(_.title)}")
+          secondBatch <- client
+            .getAllBooks(maxPageSize = 2, pageToken = firstBatch.metadata.nextPageToken)
+          _ <- IO.println(s"second batch: ${secondBatch.content.map(_.title)}")
         } yield ()
       }
   }

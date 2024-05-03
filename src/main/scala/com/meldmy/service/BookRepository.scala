@@ -39,16 +39,17 @@ trait BookRepository[F[_]] {
 
 }
 
-def storeBook[F[_]: Sync](booksRef: Ref[F, Map[UUID, Book]], book: Book) = booksRef
-  .update(_ + (book.id -> book))
-  .as(book)
-
 object BookRepository {
 
   def apply[F[_]: Sync](): F[BookRepository[F]] = Ref
     .of[F, Map[UUID, Book]](Map.empty)
     .map { booksRef =>
-      new BookRepository[F] {
+      new BookRepository[F] with InMemoryRepository[F, Book] {
+        override def id(book: Book): UUID = book.id
+
+        override def notFoundError(id: UUID): Throwable =
+          new BookNotFoundException(s"Book with id $id not found")
+
         override def addBook(
           title: String,
           author: String,
@@ -64,7 +65,7 @@ object BookRepository {
             genre,
             coverImageUrl,
           )
-          storeBook(booksRef, book)
+          storeEntity(booksRef, book)
         }
 
         override def updateBook(
@@ -74,41 +75,19 @@ object BookRepository {
           publishedDate: Timestamp,
           genre: Genre,
           coverImageUrl: Option[String],
-        ): F[Book] =
-          for {
-            books <- booksRef.get
-            _ <- raiseErrorWhenBookNotFound(id, books)
-            newBook = Book(id, title, author, publishedDate, genre, coverImageUrl)
-            result <- storeBook(booksRef, newBook)
-          } yield result
-
-        override def getBook(id: UUID): F[Book] = booksRef.get.map(_.get(id)).flatMap {
-          case Some(book) => Sync[F].pure(book)
-          case None => Sync[F].raiseError(new BookNotFoundException(s"Book with id $id not found"))
+        ): F[Book] = {
+          val book = Book(id, title, author, publishedDate, genre, coverImageUrl)
+          updateEntity(booksRef, book)
         }
+
+        override def getBook(id: UUID): F[Book] = getEntity(booksRef, id)
 
         override def queryBooks(
           maxPageSize: Int,
           pageToken: Option[String],
           sortOrder: Option[String],
-        ): F[List[Book]] = booksRef.get.map { books =>
-          val sortedBooks =
-            sortOrder match {
-              case Some("asc")  => books.values.toList.sortBy(_.title)
-              case Some("desc") => books.values.toList.sortBy(_.title).reverse
-              case _            => books.values.toList
-            }
-          sortedBooks
-            .slice(pageToken.getOrElse("0").toInt, pageToken.getOrElse("0").toInt + maxPageSize)
-        }
+        ): F[List[Book]] = queryEntities(booksRef, maxPageSize, pageToken, sortOrder, _.title)
       }
     }
-
-  private def raiseErrorWhenBookNotFound[F[_]: Sync](id: UUID, books: Map[UUID, Book]) =
-    books
-      .get(id)
-      .fold[F[Book]](
-        Sync[F].raiseError(new BookNotFoundException(s"Book with id $id not found"))
-      )(Sync[F].pure)
 
 }

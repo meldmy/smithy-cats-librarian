@@ -2,9 +2,9 @@ package com.meldmy.service
 
 import cats.Show
 import cats.effect.*
+import com.meldmy.service.common.CommonTestTrait
 import library.Book
 import library.BookNotFoundException
-//import org.scalacheck.Arbitrary.arbitrary
 import library.Genre
 import org.scalacheck.Gen
 import smithy4s.Timestamp
@@ -13,22 +13,7 @@ import weaver.scalacheck.*
 
 import java.util.Calendar
 
-object BookRepositoryTest extends SimpleIOSuite with Checkers {
-
-  private val timestampGen: Gen[Timestamp] = Gen.calendar.map { cal =>
-    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) % 10000) // Limit the year to the range 0-9999
-    Timestamp.fromEpochMilli(cal.getTimeInMillis)
-  }
-
-  private val bookDataGen =
-    for {
-      id <- Gen.uuid
-      title <- Gen.alphaStr
-      author <- Gen.alphaStr
-      publishedDate <- timestampGen
-      genre <- Gen.oneOf(Genre.values)
-      coverImageUrl <- Gen.alphaStr
-    } yield (id, title, author, publishedDate, genre, Some(coverImageUrl))
+object BookRepositoryTest extends SimpleIOSuite with Checkers with CommonTestTrait {
 
   test("adding and retrieving books should be consistent") {
     forall(bookDataGen) { case (_, title, author, publishedDate, genre, coverImageUrl) =>
@@ -76,12 +61,6 @@ object BookRepositoryTest extends SimpleIOSuite with Checkers {
     }
   }
 
-  private val failWithBookNotFoundException =
-    (ex: Either[Throwable, Book]) =>
-      ex match
-        case Left(_: BookNotFoundException) => success
-        case _                              => failure("Expected BookNotFoundException")
-
   test("queryBooks should return the correct list of books") {
     forall(bookDataGen) { case (_, title, author, publishedDate, genre, coverImageUrl) =>
       for {
@@ -91,10 +70,4 @@ object BookRepositoryTest extends SimpleIOSuite with Checkers {
       } yield expect(books.nonEmpty)
     }
   }
-
-  private given Show[Timestamp] = Show.show(_ => s"Timestamp")
-
-  private given Show[Genre] = Show.show(_ => s"Genre")
-
-  private given Show[Some[String]] = Show.show(_ => s"Some[String]")
 }
