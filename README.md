@@ -12,6 +12,26 @@ Domain Components
 BookRepository: Facilitates operations such as adding, updating, and retrieving books. Each book is validated against predefined models to ensure data integrity.
 MemberRepository: Manages library members, supporting functionalities like registration, updates, and data retrieval, providing a comprehensive system for member management.
 
+```mermaid
+graph TD
+  LibraryService --> CreateBook
+  LibraryService --> UpdateBook
+  LibraryService --> GetBook
+  LibraryService --> GetAllBooks
+  LibraryService --> CreateMember
+  LibraryService --> GetMember
+  LibraryService --> GetAllMembers
+  CreateBook --> Book
+  UpdateBook --> Book
+  GetBook --> Book
+  GetAllBooks --> Books
+  CreateMember --> Member
+  GetMember --> Member
+  GetAllMembers --> Members
+  Book --> Genre
+  Member --> Timestamp
+```
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes, without the need for setting up any prerequisites manually.
