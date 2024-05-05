@@ -10,3 +10,4 @@ target/
 
 .smithy.lsp.log
 smithy-build.json
+devbox.lock
