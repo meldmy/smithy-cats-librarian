@@ -15,7 +15,7 @@ lazy val root = project
       "org.typelevel" %% "cats-effect" % "3.5.4",
       "org.typelevel" %% "cats-effect-std" % "3.5.4",
 
-      "com.disneystreaming" %% "weaver-cats" % "0.8.3" % Test,
+      "com.disneystreaming" %% "weaver-cats" % "0.8.4" % Test,
       "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4" % Test
     ),
     fork := true,
