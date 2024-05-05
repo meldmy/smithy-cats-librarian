@@ -21,15 +21,6 @@ graph TD
   LibraryService --> CreateMember
   LibraryService --> GetMember
   LibraryService --> GetAllMembers
-  CreateBook --> Book
-  UpdateBook --> Book
-  GetBook --> Book
-  GetAllBooks --> Books
-  CreateMember --> Member
-  GetMember --> Member
-  GetAllMembers --> Members
-  Book --> Genre
-  Member --> Timestamp
 ```
 
 ## Getting Started
