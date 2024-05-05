@@ -3,7 +3,7 @@ import smithy4s.codegen.Smithy4sCodegenPlugin
 lazy val root = project
   .in(file("."))
   .settings(
-    name         := "contentful-test",
+    name         := "smithy-cats-librarian",
     version      := "0.1.1-SNAPSHOT",
     scalaVersion := "3.3.1",
     libraryDependencies ++= Seq(
