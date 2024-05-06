@@ -13,7 +13,7 @@ lazy val root = project
       "org.http4s" %% "http4s-ember-server" % "0.23.27",
       "org.http4s" %% "http4s-ember-client" % "0.23.27",
       "org.typelevel" %% "cats-effect" % "3.6-623178c",
-      "org.typelevel" %% "cats-effect-std" % "3.5.4",
+      "org.typelevel" %% "cats-effect-std" % "3.6-623178c",
 
       "com.disneystreaming" %% "weaver-cats" % "0.8.4" % Test,
       "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4" % Test
