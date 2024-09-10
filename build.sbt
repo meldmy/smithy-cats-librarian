@@ -10,7 +10,7 @@ lazy val root = project
       "com.disneystreaming.smithy4s" %% "smithy4s-core" % smithy4sVersion.value,
       "com.disneystreaming.smithy4s" %% "smithy4s-http4s" % smithy4sVersion.value,
       "com.disneystreaming.smithy4s" %% "smithy4s-http4s-swagger" % smithy4sVersion.value,
-      "org.http4s" %% "http4s-ember-server" % "0.23.27",
+      "org.http4s" %% "http4s-ember-server" % "0.23.28",
       "org.http4s" %% "http4s-ember-client" % "0.23.28",
       "org.typelevel" %% "cats-effect" % "3.6-623178c",
       "org.typelevel" %% "cats-effect-std" % "3.6-623178c",
