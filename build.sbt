@@ -5,7 +5,7 @@ lazy val root = project
   .settings(
     name         := "smithy-cats-librarian",
     version      := "0.1.1-SNAPSHOT",
-    scalaVersion := "3.6.1",
+    scalaVersion := "3.6.2",
     libraryDependencies ++= Seq(
       "com.disneystreaming.smithy4s" %% "smithy4s-core" % smithy4sVersion.value,
       "com.disneystreaming.smithy4s" %% "smithy4s-http4s" % smithy4sVersion.value,
