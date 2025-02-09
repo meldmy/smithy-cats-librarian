@@ -12,7 +12,7 @@
     "unzip@latest",
     "hub@latest",
     "sbt@latest",
-    "httpie@latest",
+    "httpie@2.6.0",
     "scalafmt@latest"
   ],
   "shell": {
