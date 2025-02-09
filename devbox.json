@@ -4,7 +4,7 @@
     "vscode-extensions.disneystreaming.smithy@latest",
     "metals@latest",
     "vscode-extensions.scalameta.metals@latest",
-    "scala_3@3.3.1",
+    "scala_3@3.3.3",
     "awscli2@latest",
     "nodejs@18.4",
     "python3@latest",
