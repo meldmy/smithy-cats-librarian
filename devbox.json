@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.6/.schema/devbox.schema.json",
   "packages": [
-    "vscode-extensions.disneystreaming.smithy@latest",
+    "vscode-extensions.disneystreaming.smithy@0.0.14",
     "metals@latest",
     "vscode-extensions.scalameta.metals@latest",
     "scala_3@3.3.1",
