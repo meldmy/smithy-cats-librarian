@@ -5,7 +5,7 @@
     "metals@latest",
     "vscode-extensions.scalameta.metals@latest",
     "scala_3@3.3.1",
-    "awscli2@latest",
+    "awscli2@2.35.11",
     "nodejs@18.4",
     "python3@latest",
     "docker-compose@latest",
