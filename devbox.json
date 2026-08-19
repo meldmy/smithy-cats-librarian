@@ -13,7 +13,7 @@
     "hub@latest",
     "sbt@latest",
     "httpie@latest",
-    "scalafmt@latest"
+    "scalafmt@3.11.5"
   ],
   "shell": {
     "init_hook": [
